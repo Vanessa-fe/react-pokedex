@@ -1,4 +1,5 @@
 import React from 'react'
+import Wrapper from '../sections/Wrapper'
 
 function Compare() {
   return (
@@ -8,4 +9,4 @@ function Compare() {
   )
 }
 
-export default Compare
+export default Wrapper(Compare);

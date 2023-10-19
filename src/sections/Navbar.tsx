@@ -34,6 +34,10 @@ function Navbar() {
     </div>
     <div className="data">
       <ul>
+        <div className="underline"></div>
+        <div className="underline"></div>
+        <div className="underline"></div>
+        
         {navigationRoutes.map(({ name, route }, index) => {
             return (
                <Link to={route} key={index}>
