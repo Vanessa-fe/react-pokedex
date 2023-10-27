@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Wrapper from '../sections/Wrapper';
-import { useAppSelector } from '../app/hooks';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
 import Login from "../assets/Login";
+import PokemonCardGrid from '../components/PokemonCardGrid';
+import { getUserPokemons } from '../app/reducers/getUserPokemons';
 
 function MyList() {
   const { userInfo } = useAppSelector(({ app }) => app);
-
-  return <div className='list'>
-    <Login />
-  </div>;
+  const { userPokemons } = useAppSelector(({ pokemon }) => pokemon);
+  const dispatch = useAppDispatch()
+  useEffect(()=> {
+dispatch(getUserPokemons());
+  }, [userInfo, dispatch]);
+  useEffect(()=> {
+console.log({userPokemons})
+  }, [userPokemons]);
+  return (
+    <div className='list'>
+      {userInfo ? <PokemonCardGrid pokemons={userPokemons} /> : <Login />}
+    </div>
+  );
 }
 
 export default Wrapper(MyList);

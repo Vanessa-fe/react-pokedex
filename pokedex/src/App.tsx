@@ -13,11 +13,22 @@ import Pokemon from './pages/Pokemon';
 import { ToastContainer, ToastOptions, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { useAppDispatch, useAppSelector } from './app/hooks';
+import { clearToasts, setUsersStatus } from './app/slices/AppSlices';
+import { onAuthStateChanged } from 'firebase/auth';
+import { firebaseAuth } from './utils/FirebaseConfig';
 
 
 function App() {
   const { toasts } = useAppSelector(({ app }) => app);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (currentUser) => {
+      if (currentUser) {
+        dispatch(setUsersStatus({ email: currentUser.email }));
+      }
+    })
+  }, [dispatch])
 
   useEffect(() => {
     if (toasts.length) {

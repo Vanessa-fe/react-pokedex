@@ -1,9 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-/* import { getDocs, query, where } from "firebase/firestore";
+import { getDocs, query, where } from "firebase/firestore";
 import { pokemonListRef } from "../../utils/FirebaseConfig";
-import { defaultImages, images, pokemonTypes } from "../../utils";
+import { defaultImages, images} from "../../utils/getPokemonImages";
+import { pokemonTypes } from "../../utils/getPokemonTypes";
 import { RootState } from "../store";
-import { userPokemonsType } from "../../utils/types";
+import { userPokemonsType } from "../../utils/Types";
 export const getUserPokemons = createAsyncThunk(
   "pokemon/userList",
   async (args, { getState }) => {
@@ -48,4 +49,4 @@ export const getUserPokemons = createAsyncThunk(
       console.log(err);
     }
   }
-); */
+); 
