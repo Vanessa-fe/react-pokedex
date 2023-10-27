@@ -1,12 +1,14 @@
-import React from 'react'
-import Wrapper from '../sections/Wrapper'
+import React from 'react';
+import Wrapper from '../sections/Wrapper';
+import { useAppSelector } from '../app/hooks';
+import Login from "../assets/Login";
 
-function Mylist() {
-  return (
-    <div>
-      Mylist
-    </div>
-  )
+function MyList() {
+  const { userInfo } = useAppSelector(({ app }) => app);
+
+  return <div className='list'>
+    <Login />
+  </div>;
 }
 
-export default Wrapper(Mylist);
+export default Wrapper(MyList);

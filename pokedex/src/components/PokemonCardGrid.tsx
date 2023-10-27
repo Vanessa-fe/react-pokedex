@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { addToCompare } from '../app/slices/PokemonSlice';
 import { useAppDispatch } from '../app/hooks';
 import { setToast } from '../app/slices/AppSlices';
+import { addPokemonToList } from '../app/reducers/addPokemonToList';
 
 function PokemonCardGrid({ pokemons }: { pokemons: userPokemonsType[] }) {
     const location = useLocation();
@@ -23,7 +24,8 @@ function PokemonCardGrid({ pokemons }: { pokemons: userPokemonsType[] }) {
                                 <div className="pokemon-card-list">
                                     {location.pathname.includes("/pokemon") ||
                                         location.pathname.includes("/search") ? (
-                                        <FaPlus className='plus' />
+                                        <FaPlus className='plus' 
+                                        onClick={() => dispatch(addPokemonToList(data))} />
                                     ) : (
                                         <FaTrash className='trash' />
                                     )}
