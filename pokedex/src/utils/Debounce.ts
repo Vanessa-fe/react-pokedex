@@ -1,9 +1,10 @@
 export const debounce = (fn: Function, timeout: number) => {
     let timer: ReturnType<typeof setTimeout>;
     return (...args: any) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            fn.apply(this, args);
-        }, timeout);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+         // @ts-ignore
+        fn.apply(this, args);
+      }, timeout);
     };
-};
+  };

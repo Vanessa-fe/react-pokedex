@@ -1,18 +1,40 @@
-import React, { useEffect, useCallback } from "react";
+ //@ts-nocheck
+import { useCallback, useEffect, useState } from "react";
 import Wrapper from "../sections/Wrapper";
 import { useParams } from "react-router-dom";
-import { useAppDispatch } from "../app/hooks";
-import axios from "axios";
-import { pokemonsRoute, pokemonSpeciesRoute } from "../utils/Constants";
-import { defaultImages, images } from "../utils/getPokemonImages";
+import { defaultImages, images } from "../utils";
 import { extractColors } from "extract-colors";
+import axios from "axios";
+import Evolution from "./Pokemon/Evolution";
+import Locations from "./Pokemon/Locations";
+import CapableMoves from "./Pokemon/CapableMoves";
+import Description from "./Pokemon/Description";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { setCurrentPokemon } from "../app/slices/PokemonSlice";
+import { setPokemonTab } from "../app/slices/AppSlices";
+import Loader from "../components/Loader";
+import {
+  pokemonRoute,
+  pokemonSpeciesRoute,
+  pokemonTabs,
+} from "../utils/Constants";
 
 function Pokemon() {
   const params = useParams();
   const dispatch = useAppDispatch();
+  const currentPokemonTab = useAppSelector(
+    ({ app: { currentPokemonTab } }) => currentPokemonTab
+  );
+  const currentPokemon = useAppSelector(
+    ({ pokemon: { currentPokemon } }) => currentPokemon
+  );
 
-  const getRecursiveEvolution: any = useCallback(
-    (evolutionChain: any, level: number, evolutionData: any) => {
+  useEffect(() => {
+    dispatch(setPokemonTab(pokemonTabs.description));
+  }, [dispatch]);
+
+  const getRecursiveEvolution = useCallback(   
+    (evolutionChain, level, evolutionData) => {
       if (!evolutionChain.evolves_to.length) {
         return evolutionData.push({
           pokemon: {
@@ -42,20 +64,22 @@ function Pokemon() {
   );
 
   const getEvolutionData = useCallback(
-    (evolutionChain: any) => {
-      const evolutionData: any[] = [];
+    (evolutionChain) => {
+      const evolutionData = [];
       getRecursiveEvolution(evolutionChain, 1, evolutionData);
       return evolutionData;
     },
     [getRecursiveEvolution]
   );
 
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const getPokemonInfo = useCallback(
-    async (image: string) => {
-      const { data } = await axios.get(`${pokemonsRoute}/${params.id}`);
+    async (image) => {
+      const { data } = await axios.get(`${pokemonRoute}/${params.id}`);
       const { data: dataEncounters } = await axios.get(
         data.location_area_encounters
       );
+
       const {
         data: {
           evolution_chain: { url: evolutionURL },
@@ -63,84 +87,84 @@ function Pokemon() {
       } = await axios.get(`${pokemonSpeciesRoute}/${data.id}`);
       const { data: evolutionData } = await axios.get(evolutionURL);
 
-      const encounters: string[] = [];
-      dataEncounters.forEach((encounter: any) => {
+      const pokemonAbilities = {
+        abilities: data.abilities.map(({ ability }) => ability.name),
+        moves: data.moves.map(({ move }) => move.name),
+      };
+
+      const encounters = [];
+      const evolution = getEvolutionData(evolutionData.chain);
+      let evolutionLevel;
+      evolutionLevel = evolution.find(
+        ({ pokemon }) => pokemon.name === data.name
+      ).level;
+      dataEncounters.forEach((encounter) => {
         encounters.push(
           encounter.location_area.name.toUpperCase().split("-").join(" ")
         );
       });
-      console.log({ data });
-      const pokemonAbilities: { abilities: string[]; moves: string[] } = {
-        abilities: data.abilities.map(
-          ({ ability }: { ability: { name: string } }) => ability.name
-        ),
-        moves: data.moves.map(
-          ({ move }: { move: { name: string } }) => move.name
-        ),
-      };
-      const evolution = getEvolutionData(evolutionData.chain);
-      const evolutionLevel = evolution.find(
-        ({ pokemon }) => pokemon.name === data.name
-      ).level;
-      console.log({
-        id: data.id,
-        name: data.name,
-        types: data.types.map(
-          ({ type: { name } }: { type: { name: string } }) => name
-        ),
-        image,
-        stats: data.stats.map(
-          ({
-            stat,
-            base_stat,
-          }: {
-            stat: { name: string };
-            base_stat: number;
-          }) => ({
-            name: stat.name,
-            value: base_stat,
-          })
-        ),
-        encounters,
-        evolutionLevel,
-        evolution,
-        pokemonAbilities,
-      });
+      const stats = await data.stats.map(({ stat, base_stat }) => ({
+        name: stat.name,
+        value: base_stat,
+      }));
+      dispatch(
+        setCurrentPokemon({
+          id: data.id,
+          name: data.name,
+          types: data.types.map(({ type: { name } }) => name),
+          image,
+          stats,
+          encounters,
+          evolutionLevel,
+          evolution,
+          pokemonAbilities,
+        })
+      );
+      setIsDataLoading(false);
     },
-    [getEvolutionData, params.id]
+    [params.id, dispatch, getEvolutionData]
   );
 
   useEffect(() => {
     const imageElemet = document.createElement("img");
-    // @ts-ignore
     imageElemet.src = images[params.id];
-    if (!imageElemet.src) {
-      // @ts-ignore
-      imageElemet.src = defaultImages[params.id];
-    }
-
     const options = {
       pixels: 10000,
       distance: 1,
       splitPower: 10,
-      colorValidator: (red: number, green: number, blue: number, alpha = 255) =>
-        alpha > 250,
+      colorValidator: (red, green, blue, alpha = 255) => alpha > 250,
       saturationDistance: 0.2,
       lightnessDistance: 0.2,
       hueDistance: 0.083333333,
     };
-
     const getColor = async () => {
       const color = await extractColors(imageElemet.src, options);
       const root = document.documentElement;
       root.style.setProperty("--accent-color", color[0].hex.split('"')[0]);
     };
     getColor();
+    let image = images[params.id];
+    if (!image) {
+      image = defaultImages[params.id];
+    }
 
-    getPokemonInfo(imageElemet.src);
-  }, [params, getPokemonInfo]);
+    getPokemonInfo(image);
+  }, [params.id, getPokemonInfo]);
 
-  return <div>Pokemon</div>;
+  return (
+    <>
+      {!isDataLoading && currentPokemon ? (
+        <>
+          {currentPokemonTab === pokemonTabs.description && <Description />}
+          {currentPokemonTab === pokemonTabs.evolution && <Evolution />}
+          {currentPokemonTab === pokemonTabs.locations && <Locations />}
+          {currentPokemonTab === pokemonTabs.moves && <CapableMoves />}
+        </>
+      ) : (
+        <Loader />
+      )}
+    </>
+  );
 }
 
 export default Wrapper(Pokemon);

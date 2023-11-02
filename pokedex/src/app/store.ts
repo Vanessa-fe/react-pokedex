@@ -1,11 +1,12 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import { AppSlice } from './slices/AppSlices';
-import { PokemonSlice } from './slices/PokemonSlice';
+import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import { PokemonSlice } from "./slices/PokemonSlice";
+import { AppSlice } from "./slices/AppSlices";
+
 
 export const store = configureStore({
   reducer: {
-    app: AppSlice.reducer,
     pokemon: PokemonSlice.reducer,
+    app: AppSlice.reducer,
   },
 });
 

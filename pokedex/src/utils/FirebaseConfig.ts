@@ -1,27 +1,20 @@
-// Import the functions you need from the SDKs you need
-import { FirebaseApp, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { collection, getFirestore } from "firebase/firestore";
+import { getFirestore, collection } from "firebase/firestore";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyA5UzvgmgMMIQSKQmiRzoFADztnWARXzng",
-    authDomain: "pokedex-2717d.firebaseapp.com",
-    projectId: "pokedex-2717d",
-    storageBucket: "pokedex-2717d.appspot.com",
-    messagingSenderId: "413181388966",
-    appId: "1:413181388966:web:c7ca7b5f073ee67c1e6c67",
-    measurementId: "G-EV1C35E3VG"
+  apiKey: "AIzaSyDNkwUXJFMOOYjNpnTkrCo1Y9nCeTpFC04",
+  authDomain: "pokedex-fe543.firebaseapp.com",
+  projectId: "pokedex-fe543",
+  storageBucket: "pokedex-fe543.appspot.com",
+  messagingSenderId: "948503681986",
+  appId: "1:948503681986:web:79250d83d60f75960a545b",
+  measurementId: "G-4Z4DWLHXGS",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const firebaseAuth = getAuth(app);
 export const firebaseDB = getFirestore(app);
 
-export const usersRef = collection (firebaseDB, "users");
+export const usersRef = collection(firebaseDB, "users");
 export const pokemonListRef = collection(firebaseDB, "pokemonList");
